@@ -8,7 +8,7 @@ import shutil
 import struct
 import tempfile
 import zipfile
-
+import os
 from os import path as osp
 from progress.bar import IncrementalBar
 from typing import Dict
@@ -168,10 +168,10 @@ class DatasetGenerator:
             # save images to data directory
             for label, image in zip(labels, images):
                 label_folder = osp.abspath(osp.join(self.data_dir_path, label))
-                image_dest = tempfile.mkstemp(dir=label_folder, suffix='.png')[1]
-
+                outfd,image_dest = tempfile.mkstemp(dir=label_folder, suffix='.png')
                 cv2.imwrite(f'{image_dest}', image.T)
-
+                outsock = os.fdopen(outfd,'w')
+                outsock.close()
                 progress_bar.next()
 
             progress_bar.finish()
